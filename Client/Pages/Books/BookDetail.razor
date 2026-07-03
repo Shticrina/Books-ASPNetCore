@@ -6,6 +6,7 @@
 @inject IBookApiService BookService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject ToastService Toast
 
 <PageHeader Title="Book details">
     <Button Style="ButtonStyle.Default"
@@ -83,6 +84,8 @@ else
         try
         {
             await BookService.DeleteBookAsync(Id);
+
+            await Toast.Success("Book deleted successfully.");
 
             Navigation.NavigateTo("/books");
         }

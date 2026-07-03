@@ -2034,6 +2034,13 @@
   .sticky {
     position: sticky;
   }
+  .toast-end {
+    @layer daisyui.l1.l2 {
+      inset-inline-start: auto;
+      inset-inline-end: calc(0.25rem * 4);
+      --toast-x: 0;
+    }
+  }
   .start-0 {
     inset-inline-start: calc(var(--spacing) * 0);
   }
@@ -2081,6 +2088,13 @@
   }
   .end-100 {
     inset-inline-end: calc(var(--spacing) * 100);
+  }
+  .toast-top {
+    @layer daisyui.l1.l2 {
+      top: calc(0.25rem * 4);
+      bottom: auto;
+      --toast-y: 0;
+    }
   }
   .top-0 {
     top: 0;
@@ -2256,6 +2270,9 @@
   }
   .z-3 {
     z-index: 3;
+  }
+  .z-50 {
+    z-index: 50;
   }
   .tab-content {
     @layer daisyui.l1.l2.l3 {
@@ -3325,6 +3342,13 @@
   }
   .text-wrap {
     text-wrap: wrap;
+  }
+  .alert-error {
+    @layer daisyui.l1.l2 {
+      color: var(--color-error-content);
+      --alert-border-color: var(--color-error);
+      --alert-color: var(--color-error);
+    }
   }
   .alert-info {
     @layer daisyui.l1.l2 {

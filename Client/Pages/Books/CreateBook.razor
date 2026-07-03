@@ -10,6 +10,7 @@
 @inject IAuthorApiService AuthorService
 @inject ICategoryApiService CategoryService
 @inject NavigationManager Navigation
+@inject ToastService Toast
 
 <PageHeader Title="Create Book">
     <Button Style="ButtonStyle.Default"
@@ -129,6 +130,8 @@ else
         try
         {
             await BookService.CreateBookAsync(model);
+            
+            await Toast.Success("Book created successfully.");
 
             Navigation.NavigateTo("/books");
         }

@@ -1,0 +1,16 @@
+<div class="alert @CssClass shadow-lg w-96">
+    <span>@Message.Message</span>
+</div>
+
+@code {
+    [Parameter]
+    public required ToastMessage Message { get; set; }
+
+    private string CssClass => Message.Type switch
+    {
+        ToastType.Success => "alert-success",
+        ToastType.Error => "alert-error",
+        ToastType.Warning => "alert-warning",
+        _ => "alert-info"
+    };
+}

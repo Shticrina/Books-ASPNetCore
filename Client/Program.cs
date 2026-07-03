@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Client.Interfaces;
 using Client.Services;
+using Client.Components.Shared.Notifications;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -15,5 +16,6 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://
 builder.Services.AddScoped<IBookApiService, BookApiService>();
 builder.Services.AddScoped<ICategoryApiService, CategoryApiService>();
 builder.Services.AddScoped<IAuthorApiService, AuthorApiService>();
+builder.Services.AddScoped<ToastService>();
 
 await builder.Build().RunAsync();
