@@ -12,9 +12,10 @@
 @inject NavigationManager Navigation
 
 <PageHeader Title="Create Book">
-    <NavLink class="btn btn-primary" href="/books">
+    <Button Style="ButtonStyle.Default"
+            Href="/books">
         Back to list
-    </NavLink>
+    </Button>
 </PageHeader>
 
 @if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -26,12 +27,11 @@
 
 @if (editContext is null)
 {
-    <p>Loading...</p>
+    <LoadingSpinner />
 }
 else
 {
     <EditForm EditContext="editContext" OnSubmit="HandleSubmit">
-
         <div class="mb-3">
             <label class="form-label">Title</label>
             <InputText class="form-control"
@@ -85,15 +85,14 @@ else
             <ValidationMessage For="@(() => model.CategoryId)" />
         </div>
 
-        <button class="btn btn-primary">
+        <Button Style="ButtonStyle.Success">
             Create Book
-        </button>
+        </Button>
 
-        <NavLink class="btn btn-secondary ms-2"
-                 href="/books">
+        <Button Style="ButtonStyle.Danger"
+                Href="/books">
             Cancel
-        </NavLink>
-
+        </Button>
     </EditForm>
 }
 

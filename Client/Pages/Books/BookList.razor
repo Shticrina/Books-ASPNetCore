@@ -4,63 +4,113 @@
 @using Client.Interfaces
 
 @inject IBookApiService BookService
+@inject IJSRuntime JS
 
 <PageHeader Title="Books">
-    <NavLink class="btn btn-primary"
-             href="/books/create">
+    <Button Style="ButtonStyle.Success"
+             Href="/books/create">
         Create Book
-    </NavLink>
+    </Button>
 </PageHeader>
 
-@if (books.Count == 0)
+@if (!string.IsNullOrWhiteSpace(errorMessage))
 {
-    <p>Loading...</p>
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
+@if (isLoading)
+{
+    <LoadingSpinner />
+}
+else if (books.Count == 0)
+{
+    <EmptyState
+        Title="No books found"
+        Message="Create your first book."
+    />
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>ISBN</th>
-                <th>Published</th>
-                <th>Author</th>
-                <th>Category</th>
-                <th></th>
-            </tr>
-        </thead>
+    <div class="w-full bg-base-200 rounded-xl">
+        <div class="p-6">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>ISBN</th>
+                        <th>Published</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th></th>
+                    </tr>
+                </thead>
 
-        <tbody>
-        @foreach (var book in books)
-        {
-            <tr>
-                <td>@book.Title</td>
-                <td>@book.Isbn</td>
-                <td>@book.PublishedYear</td>
-                <td>@book.AuthorName</td>
-                <td>@book.CategoryName</td>
-                <td>
-                    <NavLink
-                        class="btn btn-sm btn-primary"
-                        href="@($"/books/{book.Id}")">
-                        Details
-                    </NavLink>
-                    @* <button class="btn btn-sm btn-danger" @onclick="() => DeleteBook(book.Id)">Delete</button> *@
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+                <tbody>
+                @foreach (var book in books)
+                {
+                    <tr>
+                        <td>@book.Title</td>
+                        <td>@book.Isbn</td>
+                        <td>@book.PublishedYear</td>
+                        <td>@book.AuthorName</td>
+                        <td>@book.CategoryName</td>
+                        <td>
+                            <Button Style="ButtonStyle.Default"
+                                    Href="@($"/books/{book.Id}")">
+                                Details
+                            </Button>
+
+                            <Button Style="ButtonStyle.Primary"
+                                    Href="@($"/books/edit/{book.Id}")">
+                                Edit
+                            </Button>
+
+                            <Button Style="ButtonStyle.Danger"
+                                    OnClick="() => DeleteBook(book.Id)">
+                                Delete
+                            </Button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
 }
 
 @code
 {
     private List<BookDto> books = [];
+    private string? errorMessage;
+    private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
         books = await BookService.GetBooksAsync();
+        isLoading = false;
     }
 
-    
+    private async Task DeleteBook(int id)
+    {
+        @* var confirmed = await DialogService.ConfirmAsync(
+            "Delete book",
+            $"Are you sure you want to delete this book?"
+        );
+
+        if (!confirmed)
+            return; *@
+
+        try
+        {
+            await BookService.DeleteBookAsync(id);
+
+            books.RemoveAll(b => b.Id == id);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
 }

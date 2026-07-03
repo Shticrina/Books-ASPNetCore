@@ -4,25 +4,44 @@
 @using Client.Interfaces
 
 @inject IBookApiService BookService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <PageHeader Title="Book details">
-    <NavLink class="btn btn-primary"
-             href="/books">
+    <Button Style="ButtonStyle.Default"
+             Href="/books">
         Back to list
-    </NavLink>
-    <button class="btn btn-danger"
-            @onclick="async () => await BookService.DeleteBookAsync(Id)">
-        Delete Book
-    </button>
+    </Button>
+
+    <Button Style="ButtonStyle.Primary"
+             Href="@($"/books/edit/{Id}")">
+        Edit
+    </Button>
+
+    <Button Style="ButtonStyle.Danger"
+            OnClick="DeleteBook">
+        Delete
+    </Button>
 </PageHeader>
 
-@if (book is null)
+@if (!string.IsNullOrWhiteSpace(errorMessage))
 {
-    <p>Loading...</p>
+    <div class="alert alert-danger">
+        @errorMessage
+    </div>
+}
+
+@if (isLoading)
+{
+    <LoadingSpinner />
+}
+else if (book is null)
+{
+    <p>Book not found.</p>
 }
 else
 {
-    <h3>@book.Title</h3> <br />
+    <Card Title="@book.Title">
 
     <p><strong>ISBN:</strong> @book.Isbn</p>
 
@@ -31,6 +50,10 @@ else
     <p><strong>Author:</strong> @book.Author.Name</p>
 
     <p><strong>Category:</strong> @book.Category.Name</p>
+
+</Card>
+
+    
 }
 
 @code{
@@ -38,9 +61,34 @@ else
     public int Id { get; set; }
 
     private BookDetailsDto? book;
+    private string? errorMessage;
+    private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
         book = await BookService.GetBookByIdAsync(Id);
+        isLoading = false;
+    }
+
+    private async Task DeleteBook()
+    {
+        @* var confirmed = await DialogService.ConfirmAsync(
+            "Delete book",
+            $"Are you sure you want to delete this book?"
+        ); 
+
+        if (!confirmed)
+            return;*@
+
+        try
+        {
+            await BookService.DeleteBookAsync(Id);
+
+            Navigation.NavigateTo("/books");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
     }
 }

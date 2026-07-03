@@ -1,0 +1,4 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* npx @tailwindcss/cli -i ./Styles/app.css -o ./wwwroot/css/app.css --watch */
