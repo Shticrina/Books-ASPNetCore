@@ -1,0 +1,46 @@
+@page "/books/{Id:int}"
+
+@using Shared.DTOs.Books
+@using Client.Interfaces
+
+@inject IBookApiService BookService
+
+<PageHeader Title="Book details">
+    <NavLink class="btn btn-primary"
+             href="/books">
+        Back to list
+    </NavLink>
+    <button class="btn btn-danger"
+            @onclick="async () => await BookService.DeleteBookAsync(Id)">
+        Delete Book
+    </button>
+</PageHeader>
+
+@if (book is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <h3>@book.Title</h3> <br />
+
+    <p><strong>ISBN:</strong> @book.Isbn</p>
+
+    <p><strong>Published:</strong> @book.PublishedYear</p>
+
+    <p><strong>Author:</strong> @book.Author.Name</p>
+
+    <p><strong>Category:</strong> @book.Category.Name</p>
+}
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    private BookDetailsDto? book;
+
+    protected override async Task OnInitializedAsync()
+    {
+        book = await BookService.GetBookByIdAsync(Id);
+    }
+}
