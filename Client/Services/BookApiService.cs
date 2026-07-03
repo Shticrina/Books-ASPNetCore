@@ -16,46 +16,34 @@ public class BookApiService: BaseApiService, IBookApiService
 
     public async Task<List<BookDto>> GetBooksAsync()
     {
-        var response = await _http.GetFromJsonAsync<ApiResponse<List<BookDto>>>("api/books");
-
-        HandleResponse(response);
-
-        return response!.Data ?? [];
-    }
-
-    public async Task<BookDetailsDto> CreateBookAsync(CreateBookDto dto)
-    {
-        var response = await _http.PostAsJsonAsync("api/books", dto);
-
-        var apiResponse = await response.Content
-            .ReadFromJsonAsync<ApiResponse<BookDetailsDto>>();
-
-        HandleResponse(apiResponse);
-
-        return apiResponse!.Data!;
-    }
-
-    public async Task DeleteBookAsync(int id)
-    {
-        var response = await _http.DeleteAsync($"api/books/{id}");
-        var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
-
-        HandleResponse(apiResponse);
+        return await GetAsync<List<BookDto>>(_http, "api/books");
     }
 
     public async Task<BookDetailsDto?> GetBookByIdAsync(int id)
     {
-        var response = await _http.GetFromJsonAsync<ApiResponse<BookDetailsDto>>($"api/books/{id}");
-
-        HandleResponse(response);
-
-        return response!.Data;
+        return await GetAsync<BookDetailsDto>(_http, $"api/books/{id}");
     }
+
+    public async Task<BookDetailsDto> CreateBookAsync(CreateBookDto dto)
+    {
+        return await PostAsync<CreateBookDto, BookDetailsDto>(
+            _http,
+            "api/books",
+            dto);
+    }
+
     public async Task UpdateBookAsync(int id, UpdateBookDto dto)
     {
-        var response = await _http.PutAsJsonAsync($"api/books/{id}", dto);
-        var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
+        await PutAsync(
+            _http,
+            $"api/books/{id}",
+            dto);
+    }
 
-        HandleResponse(apiResponse);
+    public async Task DeleteBookAsync(int id)
+    {
+        await DeleteAsync(
+            _http,
+            $"api/books/{id}");
     }
 }

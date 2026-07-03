@@ -1,9 +1,10 @@
 @page "/books/create"
 
-@using Shared.DTOs.Authors
-@using Shared.DTOs.Categories
-@using Shared.DTOs.Books
+@using Client.Exceptions
 @using Client.Interfaces
+@using Shared.DTOs.Authors
+@using Shared.DTOs.Books
+@using Shared.DTOs.Categories
 
 @inject IBookApiService BookService
 @inject IAuthorApiService AuthorService
@@ -11,8 +12,7 @@
 @inject NavigationManager Navigation
 
 <PageHeader Title="Create Book">
-    <NavLink class="btn btn-primary"
-             href="/books">
+    <NavLink class="btn btn-primary" href="/books">
         Back to list
     </NavLink>
 </PageHeader>
@@ -24,84 +24,125 @@
     </div>
 }
 
-<EditForm Model="@model" OnSubmit="CreateNewBook">
-    @* <DataAnnotationsValidator /> *@
-    @* <ValidationSummary /> *@
+@if (editContext is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm EditContext="editContext" OnSubmit="HandleSubmit">
 
-    <div class="mb-3">
-        <label for="title" class="form-label">Title</label>
-        <InputText id="title" class="form-control" @bind-Value="model.Title" />
-        <ValidationMessage For="@(() => model.Title)" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <InputText class="form-control"
+                       @bind-Value="model.Title" />
+            <ValidationMessage For="@(() => model.Title)" />
+        </div>
 
-    <div class="mb-3">
-        <label for="isbn" class="form-label">ISBN</label>
-        <InputText id="isbn" class="form-control" @bind-Value="model.Isbn" />
-        <ValidationMessage For="@(() => model.Isbn)" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">ISBN</label>
+            <InputText class="form-control"
+                       @bind-Value="model.Isbn" />
+            <ValidationMessage For="@(() => model.Isbn)" />
+        </div>
 
-    <div class="mb-3">
-        <label class="form-label">Published Year</label>
-        <InputNumber class="form-control"
-                    @bind-Value="model.PublishedYear" />
-        <ValidationMessage For="@(() => model.PublishedYear)" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Published Year</label>
+            <InputNumber class="form-control"
+                         @bind-Value="model.PublishedYear" />
+            <ValidationMessage For="@(() => model.PublishedYear)" />
+        </div>
 
-    <div class="mb-3">
-        <label for="authorId" class="form-label">Author</label>
-        <InputSelect id="authorId" class="form-select" @bind-Value="model.AuthorId">
-            <option value="0">Select an author</option>
-            @foreach (var author in authors)
-            {
-                <option value="@author.Id">@author.Name</option>
-            }
-        </InputSelect>
-        <ValidationMessage For="@(() => model.AuthorId)" />
-    </div>
+        <div class="mb-3">
+            <label class="form-label">Author</label>
+            <InputSelect class="form-select"
+                         @bind-Value="model.AuthorId">
+                <option value="0">Select an author</option>
 
-    <div class="mb-3">
-        <label for="categoryId" class="form-label">Category</label>
-        <InputSelect id="categoryId" class="form-select" @bind-Value="model.CategoryId">
-            <option value="0">Select a category</option>
-            @foreach (var category in categories)
-            {
-                <option value="@category.Id">@category.Name</option>
-            }
-        </InputSelect>
-        <ValidationMessage For="@(() => model.CategoryId)" />
-    </div>
+                @foreach (var author in authors)
+                {
+                    <option value="@author.Id">@author.Name</option>
+                }
+            </InputSelect>
 
-    <div class="mb-3">
-        <button type="submit" class="btn btn-primary">Create Book</button>
+            <ValidationMessage For="@(() => model.AuthorId)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Category</label>
+
+            <InputSelect class="form-select"
+                         @bind-Value="model.CategoryId">
+
+                <option value="0">Select a category</option>
+
+                @foreach (var category in categories)
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </InputSelect>
+
+            <ValidationMessage For="@(() => model.CategoryId)" />
+        </div>
+
+        <button class="btn btn-primary">
+            Create Book
+        </button>
+
         <NavLink class="btn btn-secondary ms-2"
-                href="/books">
+                 href="/books">
             Cancel
         </NavLink>
-    </div>
-</EditForm>
+
+    </EditForm>
+}
 
 @code
 {
-    private CreateBookDto model = new() { Title = string.Empty };
+    private CreateBookDto model = new()
+    {
+        Title = string.Empty
+    };
+
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+
     private List<AuthorDto> authors = [];
     private List<CategoryDto> categories = [];
+
     private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
+        editContext = new EditContext(model);
+        messageStore = new ValidationMessageStore(editContext);
+
         authors = await AuthorService.GetAuthorsAsync();
         categories = await CategoryService.GetCategoriesAsync();
     }
 
-    private async Task CreateNewBook()
+    private async Task HandleSubmit(EditContext context)
     {
         errorMessage = null;
+
+        messageStore!.Clear();
 
         try
         {
             await BookService.CreateBookAsync(model);
+
             Navigation.NavigateTo("/books");
-            @* successMessage = "Book created successfully!"; *@
+        }
+        catch (ApiValidationException ex)
+        {
+            foreach (var error in ex.ValidationProblem.Errors)
+            {
+                messageStore.Add(
+                    new FieldIdentifier(model, error.Key),
+                    error.Value);
+            }
+
+            editContext!.NotifyValidationStateChanged();
         }
         catch (Exception ex)
         {
