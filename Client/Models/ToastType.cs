@@ -1,4 +1,4 @@
-namespace Client.Components.Shared.Notifications;
+namespace Client.Models;
 
 public enum ToastType
 {

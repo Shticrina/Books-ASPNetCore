@@ -1,5 +1,8 @@
 @implements IDisposable
-@inject ToastService ToastService
+
+@using Client.Services.UI
+@using Client.Models
+@inject ToastService Toast
 
 <div class="toast toast-top toast-end z-50">
     @foreach (var toast in toasts)
@@ -13,7 +16,7 @@
 
     protected override void OnInitialized()
     {
-        ToastService.OnShow += ShowToast;
+        Toast.OnShow += ShowToast;
     }
 
     private async Task ShowToast(ToastMessage toast)
@@ -31,6 +34,6 @@
 
     public void Dispose()
     {
-        ToastService.OnShow -= ShowToast;
+        Toast.OnShow -= ShowToast;
     }
 }

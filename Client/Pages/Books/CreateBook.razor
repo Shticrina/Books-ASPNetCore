@@ -1,15 +1,19 @@
 @page "/books/create"
 
 @using Client.Exceptions
-@using Client.Interfaces
 @using Shared.DTOs.Authors
 @using Shared.DTOs.Books
 @using Shared.DTOs.Categories
+@using Client.Interfaces.Api
+@using Client.Services.UI
+@using Client.Models
 
 @inject IBookApiService BookService
 @inject IAuthorApiService AuthorService
 @inject ICategoryApiService CategoryService
+@inject IJSRuntime JS
 @inject NavigationManager Navigation
+@inject DialogService DialogService
 @inject ToastService Toast
 
 <PageHeader Title="Create Book">

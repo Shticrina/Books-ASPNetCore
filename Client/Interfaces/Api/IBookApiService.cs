@@ -1,6 +1,6 @@
 using Shared.DTOs.Books;
 
-namespace Client.Interfaces;
+namespace Client.Interfaces.Api;
 
 public interface IBookApiService
 {

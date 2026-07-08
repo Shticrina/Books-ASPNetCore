@@ -1,4 +1,4 @@
-namespace Client.Components.UI;
+namespace Client.Models;
 
 public static class ButtonStyleExtensions
 {

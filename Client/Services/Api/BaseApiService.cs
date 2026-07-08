@@ -3,7 +3,7 @@ using Shared.Responses;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace Client.Services;// Add generic methods in BaseApiService (Client)
+namespace Client.Services.Api;
 
 public abstract class BaseApiService
 {

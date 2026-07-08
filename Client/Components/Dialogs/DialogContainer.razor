@@ -1,0 +1,54 @@
+@using Client.Services.UI
+@inject DialogService DialogService
+
+@implements IDisposable
+
+<ConfirmDialog
+    Visible="@visible"
+    Title="@title"
+    Message="@message"
+    OnResult="HandleResult" />
+
+@code
+{
+    private bool visible;
+    private string title = "";
+    private string message = "";
+
+    private TaskCompletionSource<bool>? completionSource;
+
+    protected override void OnInitialized()
+    {
+        DialogService.OnConfirm += ShowDialog;
+    }
+
+    private Task<bool> ShowDialog(string dialogTitle, string dialogMessage)
+    {
+        title = dialogTitle;
+        message = dialogMessage;
+
+        visible = true;
+
+        completionSource = new TaskCompletionSource<bool>();
+
+        InvokeAsync(StateHasChanged);
+
+        return completionSource.Task;
+    }
+
+    private Task HandleResult(bool confirmed)
+    {
+        visible = false;
+
+        completionSource?.SetResult(confirmed);
+
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        DialogService.OnConfirm -= ShowDialog;
+    }
+}

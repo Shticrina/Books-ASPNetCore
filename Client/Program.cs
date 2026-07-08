@@ -1,9 +1,9 @@
 using Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Client.Interfaces;
-using Client.Services;
-using Client.Components.Shared.Notifications;
+using Client.Interfaces.Api;
+using Client.Services.Api;
+using Client.Services.UI;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -17,5 +17,6 @@ builder.Services.AddScoped<IBookApiService, BookApiService>();
 builder.Services.AddScoped<ICategoryApiService, CategoryApiService>();
 builder.Services.AddScoped<IAuthorApiService, AuthorApiService>();
 builder.Services.AddScoped<ToastService>();
+builder.Services.AddScoped<DialogService>();
 
 await builder.Build().RunAsync();

@@ -1,6 +1,6 @@
 using Shared.DTOs.Authors;
 
-namespace Client.Interfaces;
+namespace Client.Interfaces.Api;
 
 public interface IAuthorApiService
 {

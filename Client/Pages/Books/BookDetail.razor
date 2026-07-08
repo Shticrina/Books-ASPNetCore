@@ -1,11 +1,14 @@
 @page "/books/{Id:int}"
 
 @using Shared.DTOs.Books
-@using Client.Interfaces
+@using Client.Interfaces.Api
+@using Client.Services.UI
+@using Client.Models
 
-@inject IBookApiService BookService
-@inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject IBookApiService BookService
+@inject DialogService DialogService
 @inject ToastService Toast
 
 <PageHeader Title="Book details">

@@ -1,8 +1,8 @@
 using System.Net.Http.Json;
-using Client.Interfaces;
+using Client.Interfaces.Api;
 using Shared.DTOs.Authors;
 
-namespace Client.Services;
+namespace Client.Services.Api;
 
 public class AuthorApiService : IAuthorApiService
 {

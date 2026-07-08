@@ -1,4 +1,6 @@
-namespace Client.Components.Shared.Notifications;
+using Client.Models;
+
+namespace Client.Services.UI;
 
 public class ToastService
 {

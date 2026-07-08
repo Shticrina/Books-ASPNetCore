@@ -1,9 +1,9 @@
 using Shared.DTOs.Books;
-using Client.Interfaces;
+using Client.Interfaces.Api;
 using System.Net.Http.Json;
 using Shared.Responses;
 
-namespace Client.Services;
+namespace Client.Services.Api;
 
 public class BookApiService: BaseApiService, IBookApiService
 {

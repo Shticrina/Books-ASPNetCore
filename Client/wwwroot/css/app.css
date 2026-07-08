@@ -10,6 +10,8 @@
     --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
+    --text-lg: 1.125rem;
+    --text-lg--line-height: calc(1.75 / 1.125);
     --text-2xl: 1.5rem;
     --text-2xl--line-height: calc(2 / 1.5);
     --text-3xl: 1.875rem;
@@ -2370,6 +2372,27 @@
       }
     }
   }
+  .modal-box {
+    @layer daisyui.l1.l2.l3 {
+      grid-column-start: 1;
+      grid-row-start: 1;
+      max-height: 100vh;
+      width: calc(11 / 12 * 100%);
+      max-width: 32rem;
+      background-color: var(--color-base-100);
+      padding: calc(0.25rem * 6);
+      transition: translate 0.3s ease-out, scale 0.3s ease-out, opacity 0.2s ease-out 0.05s, box-shadow 0.3s ease-out;
+      border-top-left-radius: var(--modal-tl, var(--radius-box));
+      border-top-right-radius: var(--modal-tr, var(--radius-box));
+      border-bottom-left-radius: var(--modal-bl, var(--radius-box));
+      border-bottom-right-radius: var(--modal-br, var(--radius-box));
+      scale: 95%;
+      opacity: 0;
+      box-shadow: oklch(0% 0 0/ 0.25) 0px 25px 50px -12px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+  }
   .float-end {
     float: inline-end;
   }
@@ -2456,6 +2479,9 @@
   }
   .my-5 {
     margin-block: calc(var(--spacing) * 5);
+  }
+  .my-6 {
+    margin-block: calc(var(--spacing) * 6);
   }
   .my-auto {
     margin-block: auto;
@@ -2597,6 +2623,14 @@
   .me-auto {
     margin-inline-end: auto;
   }
+  .modal-action {
+    @layer daisyui.l1.l2.l3 {
+      margin-top: calc(0.25rem * 6);
+      display: flex;
+      justify-content: flex-end;
+      gap: calc(0.25rem * 2);
+    }
+  }
   .mt-0 {
     margin-top: 0;
   }
@@ -2614,6 +2648,9 @@
   }
   .mt-5 {
     margin-top: calc(var(--spacing) * 5);
+  }
+  .mt-12 {
+    margin-top: calc(var(--spacing) * 12);
   }
   .mt-auto {
     margin-top: auto;
@@ -3223,6 +3260,9 @@
   .py-5 {
     padding-block: calc(var(--spacing) * 5);
   }
+  .py-10 {
+    padding-block: calc(var(--spacing) * 10);
+  }
   .py-12 {
     padding-block: calc(var(--spacing) * 12);
   }
@@ -3332,6 +3372,10 @@
   .text-3xl {
     font-size: var(--text-3xl);
     line-height: var(--tw-leading, var(--text-3xl--line-height));
+  }
+  .text-lg {
+    font-size: var(--text-lg);
+    line-height: var(--tw-leading, var(--text-lg--line-height));
   }
   .font-bold {
     --tw-font-weight: var(--font-weight-bold);

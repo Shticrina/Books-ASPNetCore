@@ -1,6 +1,6 @@
 using Shared.DTOs.Categories;
 
-namespace Client.Interfaces;
+namespace Client.Interfaces.Api;
 
 public interface ICategoryApiService
 {
