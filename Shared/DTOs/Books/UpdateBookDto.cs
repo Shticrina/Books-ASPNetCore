@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Shared.DTOs.Books
 {
 
-    public class UpdateBookDto
+    public class UpdateBookDto: IBookFormModel
     {
         [Required]
         [StringLength(100, MinimumLength = 2)]

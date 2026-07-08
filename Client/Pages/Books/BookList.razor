@@ -108,8 +108,8 @@ else
 
         try
         {
-            @* await BookService.DeleteBookAsync(id); *@
-            @* books.RemoveAll(b => b.Id == id); *@
+            await BookService.DeleteBookAsync(id);
+            books.RemoveAll(b => b.Id == id);
             await Toast.Success("Book deleted successfully.");
         }
         catch (Exception ex)

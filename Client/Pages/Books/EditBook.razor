@@ -1,4 +1,4 @@
-@page "/books/create"
+@page "/books/edit/{Id:int}"
 
 @using Client.Exceptions
 @using Shared.DTOs.Authors
@@ -16,7 +16,7 @@
 @inject DialogService DialogService
 @inject ToastService Toast
 
-<PageHeader Title="Create Book">
+<PageHeader Title="Edit Book">
     <Button Style="ButtonStyle.Default"
             Href="/books">
         Back to list
@@ -41,13 +41,13 @@ else
         Authors="authors"
         Categories="categories"
         EditContext="editContext"
-        SubmitText="Create Book"
-        OnSubmit="HandleSubmit" />
+        SubmitText="Save changes"
+        OnSubmit="SaveBook" /> 
 }
 
 @code
 {
-    private CreateBookDto model = new()
+    private UpdateBookDto model = new()
     {
         Title = string.Empty
     };
@@ -60,6 +60,9 @@ else
 
     private string? errorMessage;
 
+    [Parameter]
+    public int Id { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         editContext = new EditContext(model);
@@ -67,9 +70,20 @@ else
 
         authors = await AuthorService.GetAuthorsAsync();
         categories = await CategoryService.GetCategoriesAsync();
+
+        var book = await BookService.GetBookByIdAsync(Id);
+
+        if (book is null)
+            return;
+
+        model.Title = book.Title;
+        model.Isbn = book.Isbn;
+        model.PublishedYear = book.PublishedYear;
+        model.AuthorId = book.Author.Id;
+        model.CategoryId = book.Category.Id;
     }
 
-    private async Task HandleSubmit()
+    private async Task SaveBook()
     {
         errorMessage = null;
 
@@ -77,19 +91,18 @@ else
 
         try
         {
-            await BookService.CreateBookAsync(model);
-            
-            await Toast.Success("Book created successfully.");
+            await BookService.UpdateBookAsync(Id, model);
 
-            Navigation.NavigateTo("/books");
+            await Toast.Success("Book updated successfully.");
+
+            Navigation.NavigateTo($"/books/{Id}");
         }
         catch (ApiValidationException ex)
         {
             foreach (var error in ex.ValidationProblem.Errors)
             {
-                messageStore.Add(
-                    new FieldIdentifier(model, error.Key),
-                    error.Value);
+                var field = new FieldIdentifier(model, error.Key);
+                messageStore.Add(field, error.Value);
             }
 
             editContext!.NotifyValidationStateChanged();

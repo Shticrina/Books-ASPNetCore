@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Shared.DTOs.Books
 {
-    public class CreateBookDto
+    public class CreateBookDto: IBookFormModel
     {
         [Required]
         [StringLength(100, MinimumLength = 2)]

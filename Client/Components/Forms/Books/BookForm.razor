@@ -1,0 +1,107 @@
+@using Client.Models
+@using Shared.DTOs.Authors
+@using Shared.DTOs.Categories
+@using Shared.DTOs.Books
+
+@typeparam TModel where TModel : IBookFormModel
+
+<EditForm EditContext="EditContext" OnSubmit="HandleSubmit">
+    <div class="space-y-6">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Title</span>
+            </label>
+            <InputText class="input input-bordered w-full"
+                       @bind-Value="Model.Title" />
+            <ValidationMessage For="@(() => Model.Title)" />
+        </div>
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">ISBN</span>
+            </label>
+            <InputText class="input input-bordered w-full"
+                       @bind-Value="Model.Isbn" />
+            <ValidationMessage For="@(() => Model.Isbn)" />
+        </div>
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Published Year</span>
+            </label>
+            <InputNumber class="input input-bordered w-full"
+                         @bind-Value="Model.PublishedYear" />
+            <ValidationMessage For="@(() => Model.PublishedYear)" />
+        </div>
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Author</span>
+            </label>
+            <InputSelect class="select select-bordered w-full"
+                         @bind-Value="Model.AuthorId">
+                <option value="0">Select author</option>
+                @foreach (var author in Authors)
+                {
+                    <option value="@author.Id">
+                        @author.Name
+                    </option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => Model.AuthorId)" />
+        </div>
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Category</span>
+            </label>
+            <InputSelect class="select select-bordered w-full"
+                         @bind-Value="Model.CategoryId">
+                <option value="0">Select category</option>
+                @foreach (var category in Categories)
+                {
+                    <option value="@category.Id">
+                        @category.Name
+                    </option>
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => Model.CategoryId)" />
+        </div>
+
+        <div class="flex gap-2 justify-end">
+            <Button Style="ButtonStyle.Default"
+                    Href="/books">
+                Cancel
+            </Button>
+            <Button Style="ButtonStyle.Primary"
+                    Type="submit">
+                @SubmitText
+            </Button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public TModel Model { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EditContext EditContext { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public List<AuthorDto> Authors { get; set; } = [];
+
+    [Parameter, EditorRequired]
+    public List<CategoryDto> Categories { get; set; } = [];
+
+    [Parameter]
+    public string SubmitText { get; set; } = "Save";
+
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    private async Task HandleSubmit()
+    {
+        await OnSubmit.InvokeAsync();
+    }
+}
