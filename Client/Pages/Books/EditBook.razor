@@ -23,13 +23,6 @@
     </Button>
 </PageHeader>
 
-@if (!string.IsNullOrWhiteSpace(errorMessage))
-{
-    <div class="alert alert-danger">
-        @errorMessage
-    </div>
-}
-
 @if (editContext is null)
 {
     <LoadingSpinner />
@@ -58,8 +51,6 @@ else
     private List<AuthorDto> authors = [];
     private List<CategoryDto> categories = [];
 
-    private string? errorMessage;
-
     [Parameter]
     public int Id { get; set; }
 
@@ -85,8 +76,6 @@ else
 
     private async Task SaveBook()
     {
-        errorMessage = null;
-
         messageStore!.Clear();
 
         try
@@ -109,7 +98,7 @@ else
         }
         catch (Exception ex)
         {
-            errorMessage = ex.Message;
+            await Toast.Error(ex.Message);
         }
     }
 }

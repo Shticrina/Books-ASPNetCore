@@ -69,9 +69,13 @@ else
     private async Task DeleteBook()
     {
         var confirmed = await DialogService.ConfirmAsync(
-            "Delete book",
-            $"Are you sure you want to delete this book?"
-        ); 
+            new DialogOptions
+            {
+                Title = "Delete book",
+                Message = "Are you sure you want to delete this book?",
+                ConfirmText = "Delete",
+                ConfirmStyle = ButtonStyle.Danger
+            });
 
         if (!confirmed)
             return;

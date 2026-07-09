@@ -103,7 +103,6 @@
   }
   img, svg, video, canvas, audio, iframe, embed, object {
     display: block;
-    vertical-align: middle;
   }
   img, video {
     max-width: 100%;
@@ -318,7 +317,7 @@
         align-items: center;
         justify-content: center;
         text-align: center;
-        webkit-user-select: none;
+        -webkit-user-select: none;
         user-select: none;
         &:hover {
           @media (hover: hover) {
@@ -1458,7 +1457,7 @@
         width: var(--range-thumb-size);
         border: var(--range-p) solid;
         appearance: none;
-        webkit-appearance: none;
+        -webkit-appearance: none;
         inset-block-start: 50%;
         color: var(--range-progress);
         transform: translateY(-50%);
@@ -2908,6 +2907,9 @@
   }
   .h-auto {
     height: auto;
+  }
+  .min-h-screen {
+    min-height: 100vh;
   }
   .loading-lg {
     @layer daisyui.l1.l2 {

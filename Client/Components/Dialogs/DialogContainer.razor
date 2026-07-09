@@ -1,19 +1,18 @@
+@using Client.Models
 @using Client.Services.UI
 @inject DialogService DialogService
 
 @implements IDisposable
 
-<ConfirmDialog
+<Dialog
     Visible="@visible"
-    Title="@title"
-    Message="@message"
+    Options="@options"
     OnResult="HandleResult" />
 
 @code
 {
     private bool visible;
-    private string title = "";
-    private string message = "";
+    private DialogOptions options = new();
 
     private TaskCompletionSource<bool>? completionSource;
 
@@ -22,10 +21,9 @@
         DialogService.OnConfirm += ShowDialog;
     }
 
-    private Task<bool> ShowDialog(string dialogTitle, string dialogMessage)
+    private Task<bool> ShowDialog(DialogOptions dialogOptions)
     {
-        title = dialogTitle;
-        message = dialogMessage;
+        options = dialogOptions;
 
         visible = true;
 
