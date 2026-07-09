@@ -1,0 +1,15 @@
+@using Client.Models
+@using Microsoft.AspNetCore.Components
+
+<div class="@CssClass">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter] public BadgeStyle Style { get; set; } = BadgeStyle.Info;
+
+    private string CssClass =>
+        $"badge badge-{Style.ToCss()} rounded-full lowercase flex items-center px-3 pb-1 text-xs font-semibold border border-gray-300";
+}

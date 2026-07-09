@@ -39,18 +39,14 @@ else if (book is null)
 else
 {
     <Card Title="@book.Title">
+        <p><strong>ISBN:</strong> @book.Isbn</p>
 
-    <p><strong>ISBN:</strong> @book.Isbn</p>
+        <p><strong>Published:</strong> @book.PublishedYear</p>
 
-    <p><strong>Published:</strong> @book.PublishedYear</p>
+        <p><strong>Author:</strong> @book.Author.Name</p>
 
-    <p><strong>Author:</strong> @book.Author.Name</p>
-
-    <p><strong>Category:</strong> @book.Category.Name</p>
-
-</Card>
-
-    
+        <p><strong>Category:</strong> @book.Category.Name</p>
+    </Card>
 }
 
 @code{

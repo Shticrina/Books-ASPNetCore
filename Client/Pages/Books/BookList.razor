@@ -30,51 +30,53 @@ else if (books.Count == 0)
 }
 else
 {
-    <div class="w-full bg-base-200 rounded-xl">
-        <div class="p-6">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>ISBN</th>
-                        <th>Published</th>
-                        <th>Author</th>
-                        <th>Category</th>
-                        <th></th>
-                    </tr>
-                </thead>
+    <Section>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>ISBN</th>
+                    <th>Published</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th></th>
+                </tr>
+            </thead>
 
-                <tbody>
-                @foreach (var book in books)
-                {
-                    <tr>
-                        <td>@book.Title</td>
-                        <td>@book.Isbn</td>
-                        <td>@book.PublishedYear</td>
-                        <td>@book.AuthorName</td>
-                        <td>@book.CategoryName</td>
-                        <td>
-                            <Button Style="ButtonStyle.Default"
-                                    Href="@($"/books/{book.Id}")">
-                                Details
-                            </Button>
+            <tbody>
+            @foreach (var book in books)
+            {
+                <tr>
+                    <td>@book.Title</td>
+                    <td>@book.Isbn</td>
+                    <td>@book.PublishedYear</td>
+                    <td>@book.AuthorName</td>
+                    <td>
+                        <Badge Style="@GetCategoryBadge(book.CategoryName)">
+                            @book.CategoryName
+                        </Badge>
+                    </td>
+                    <td>
+                        <Button Style="ButtonStyle.Default"
+                                Href="@($"/books/{book.Id}")">
+                            Details
+                        </Button>
 
-                            <Button Style="ButtonStyle.Primary"
-                                    Href="@($"/books/edit/{book.Id}")">
-                                Edit
-                            </Button>
+                        <Button Style="ButtonStyle.Primary"
+                                Href="@($"/books/edit/{book.Id}")">
+                            Edit
+                        </Button>
 
-                            <Button Style="ButtonStyle.Danger"
-                                    OnClick="() => DeleteBook(book.Id)">
-                                Delete
-                            </Button>
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        </div>
-    </div>
+                        <Button Style="ButtonStyle.Danger"
+                                OnClick="() => DeleteBook(book.Id)">
+                            Delete
+                        </Button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </Section>
 }
 
 @code
@@ -86,6 +88,19 @@ else
     {
         books = await BookService.GetBooksAsync();
         isLoading = false;
+    }
+
+    private BadgeStyle GetCategoryBadge(string category)
+    {
+        return category switch
+        {
+            "Fantasy" => BadgeStyle.Primary,
+            "Science" => BadgeStyle.Info,
+            "History" => BadgeStyle.Warning,
+            "Biography" => BadgeStyle.Success,
+            "Horror" => BadgeStyle.Danger,
+            _ => BadgeStyle.Default
+        };
     }
 
     private async Task DeleteBook(int id)
