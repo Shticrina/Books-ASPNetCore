@@ -1,0 +1,88 @@
+@page "/categories/edit/{Id:int}"
+
+@using Client.Exceptions
+@using Shared.DTOs.Categories
+@using Client.Interfaces.Api
+@using Client.Services.UI
+@using Client.Models
+
+@inject ICategoryApiService CategoryService
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject DialogService DialogService
+@inject ToastService Toast
+
+<PageHeader Title="Edit Category">
+    <Button Style="ButtonStyle.Default"
+            Href="/categories">
+        Back to list
+    </Button>
+</PageHeader>
+
+@if (editContext is null)
+{
+    <LoadingSpinner />
+}
+else
+{
+    <CategoryForm
+        Model="model"
+        EditContext="editContext"
+        SubmitText="Save changes"
+        OnSubmit="SaveCategory" /> 
+}
+
+@code
+{
+    private CreateUpdateCategoryDto model = new()
+    {
+        Name = string.Empty
+    };
+
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        editContext = new EditContext(model);
+        messageStore = new ValidationMessageStore(editContext);
+
+        var category = await CategoryService.GetCategoryByIdAsync(Id);
+
+        if (category is null)
+            return;
+
+        model.Name = category.Name;
+    }
+
+    private async Task SaveCategory()
+    {
+        messageStore!.Clear();
+
+        try
+        {
+            await CategoryService.UpdateCategoryAsync(Id, model);
+
+            await Toast.Success("Category updated successfully.");
+
+            Navigation.NavigateTo($"/categories/{Id}");
+        }
+        catch (ApiValidationException ex)
+        {
+            foreach (var error in ex.ValidationProblem.Errors)
+            {
+                var field = new FieldIdentifier(model, error.Key);
+                messageStore.Add(field, error.Value);
+            }
+
+            editContext!.NotifyValidationStateChanged();
+        }
+        catch (Exception ex)
+        {
+            await Toast.Error(ex.Message);
+        }
+    }
+}

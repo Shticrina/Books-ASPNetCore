@@ -1,0 +1,89 @@
+@page "/authors/edit/{Id:int}"
+
+@using Client.Exceptions
+@using Shared.DTOs.Authors
+@using Client.Interfaces.Api
+@using Client.Services.UI
+@using Client.Models
+
+@inject IAuthorApiService AuthorService
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject DialogService DialogService
+@inject ToastService Toast
+
+<PageHeader Title="Edit Author">
+    <Button Style="ButtonStyle.Default"
+            Href="/authors">
+        Back to list
+    </Button>
+</PageHeader>
+
+@if (editContext is null)
+{
+    <LoadingSpinner />
+}
+else
+{
+    <AuthorForm
+        Model="model"
+        EditContext="editContext"
+        SubmitText="Save changes"
+        OnSubmit="SaveAuthor" /> 
+}
+
+@code
+{
+    private CreateUpdateAuthorDto model = new()
+    {
+        Name = string.Empty
+    };
+
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        editContext = new EditContext(model);
+        messageStore = new ValidationMessageStore(editContext);
+
+        var author = await AuthorService.GetAuthorByIdAsync(Id);
+
+        if (author is null)
+            return;
+
+        model.Name = author.Name;
+        model.Bio = author.Bio;
+    }
+
+    private async Task SaveAuthor()
+    {
+        messageStore!.Clear();
+
+        try
+        {
+            await AuthorService.UpdateAuthorAsync(Id, model);
+
+            await Toast.Success("Author updated successfully.");
+
+            Navigation.NavigateTo($"/authors/{Id}");
+        }
+        catch (ApiValidationException ex)
+        {
+            foreach (var error in ex.ValidationProblem.Errors)
+            {
+                var field = new FieldIdentifier(model, error.Key);
+                messageStore.Add(field, error.Value);
+            }
+
+            editContext!.NotifyValidationStateChanged();
+        }
+        catch (Exception ex)
+        {
+            await Toast.Error(ex.Message);
+        }
+    }
+}

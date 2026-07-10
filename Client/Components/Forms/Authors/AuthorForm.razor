@@ -1,0 +1,54 @@
+@using Client.Models
+@using Shared.DTOs.Authors
+
+<EditForm EditContext="EditContext" OnSubmit="HandleSubmit">
+    <div class="space-y-6">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Name</span>
+            </label>
+            <InputText class="input input-bordered w-full"
+                       @bind-Value="Model.Name" />
+            <ValidationMessage For="@(() => Model.Name)" />
+        </div>
+
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Bio</span>
+            </label>
+            <InputText class="input input-bordered w-full"
+                       @bind-Value="Model.Bio" />
+            <ValidationMessage For="@(() => Model.Bio)" />
+        </div>
+
+        <div class="flex gap-2 justify-end">
+            <Button Style="ButtonStyle.Default"
+                    Href="/authors">
+                Cancel
+            </Button>
+            <Button Style="ButtonStyle.Primary"
+                    Type="submit">
+                @SubmitText
+            </Button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public CreateUpdateAuthorDto Model { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EditContext EditContext { get; set; } = default!;
+
+    [Parameter]
+    public string SubmitText { get; set; } = "Save";
+
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    private async Task HandleSubmit()
+    {
+        await OnSubmit.InvokeAsync();
+    }
+}

@@ -1,0 +1,80 @@
+@page "/authors/create"
+
+@using Client.Exceptions
+@using Shared.DTOs.Authors
+@using Client.Interfaces.Api
+@using Client.Services.UI
+@using Client.Models
+
+@inject IAuthorApiService AuthorService
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject DialogService DialogService
+@inject ToastService Toast
+
+<PageHeader Title="Create Author">
+    <Button Style="ButtonStyle.Default"
+            Href="/authors">
+        Back to list
+    </Button>
+</PageHeader>
+
+@if (editContext is null)
+{
+    <LoadingSpinner />
+}
+else
+{
+    <AuthorForm
+        Model="model"
+        EditContext="editContext"
+        SubmitText="Create Author"
+        OnSubmit="HandleSubmit" />
+}
+
+@code
+{
+    private CreateUpdateAuthorDto model = new()
+    {
+        Name = string.Empty,
+        Bio = string.Empty
+    };
+
+    private EditContext? editContext;
+    private ValidationMessageStore? messageStore;
+
+    protected override async Task OnInitializedAsync()
+    {
+        editContext = new EditContext(model);
+        messageStore = new ValidationMessageStore(editContext);
+    }
+
+    private async Task HandleSubmit()
+    {
+        messageStore!.Clear();
+
+        try
+        {
+            await AuthorService.CreateAuthorAsync(model);
+            
+            await Toast.Success("Author created successfully.");
+
+            Navigation.NavigateTo("/authors");
+        }
+        catch (ApiValidationException ex)
+        {
+            foreach (var error in ex.ValidationProblem.Errors)
+            {
+                messageStore.Add(
+                    new FieldIdentifier(model, error.Key),
+                    error.Value);
+            }
+
+            editContext!.NotifyValidationStateChanged();
+        }
+        catch (Exception ex)
+        {
+            await Toast.Error(ex.Message);
+        }
+    }
+}

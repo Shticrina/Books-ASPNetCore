@@ -1,0 +1,107 @@
+@page "/authors"
+
+@using Shared.DTOs.Authors
+@using Client.Interfaces.Api
+@using Client.Services.UI
+@using Client.Models
+
+@inject IJSRuntime JS
+@inject IAuthorApiService AuthorService
+@inject DialogService DialogService
+@inject ToastService Toast
+
+<PageHeader Title="Authors">
+    <Button Style="ButtonStyle.Success"
+             Href="/authors/create">
+        Create Author
+    </Button>
+</PageHeader>
+
+@if (isLoading)
+{
+    <LoadingSpinner />
+}
+else if (authors.Count == 0)
+{
+    <EmptyState
+        Title="No authors found"
+        Message="Create your first author."
+    />
+}
+else
+{
+    <Section>
+        <table class="table w-full">
+            <thead>
+                <tr class="w-full flex justify-between">
+                    <th class="w-full text-left">Name</th>
+                    <th class="w-full text-left">Biography</th>
+                    <th class="w-150 text-center">Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            @foreach (var author in authors)
+            {
+                <tr class="w-full flex justify-between">
+                    <td class="w-full text-left">@author.Name</td>
+                    <td class="w-full text-left">@author.Bio</td>
+
+                    <td class="w-150 text-right">
+                        <Button Style="ButtonStyle.Default"
+                                Href="@($"/authors/{author.Id}")">
+                            Details
+                        </Button>
+                        <Button Style="ButtonStyle.Primary"
+                                Href="@($"/authors/edit/{author.Id}")">
+                            Edit
+                        </Button>
+                        <Button Style="ButtonStyle.Danger"
+                                OnClick="() => DeleteAuthor(author.Id)">
+                            Delete
+                        </Button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </Section>
+}
+
+@code
+{
+    private List<AuthorDto> authors = [];
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        authors = await AuthorService.GetAuthorsAsync();
+        isLoading = false;
+    }
+
+    private async Task DeleteAuthor(int id)
+    {
+        var confirmed = await DialogService.ConfirmAsync(
+    new DialogOptions
+            {
+                Title = "Delete author",
+                Message = "Are you sure you want to delete this author?",
+                ConfirmText = "Delete",
+                ConfirmStyle = ButtonStyle.Danger
+            });
+
+        if (!confirmed)
+            return;
+
+        try
+        {
+            await AuthorService.DeleteAuthorAsync(id);
+            authors.RemoveAll(a => a.Id == id);
+            await Toast.Success("Author deleted successfully.");
+        }
+        catch (Exception ex)
+        {
+            await Toast.Error(ex.Message);
+        }
+    }
+}

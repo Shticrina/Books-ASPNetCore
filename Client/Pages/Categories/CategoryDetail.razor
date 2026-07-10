@@ -1,0 +1,86 @@
+@page "/categories/{Id:int}"
+
+@using Shared.DTOs.Categories
+@using Client.Interfaces.Api
+@using Client.Services.UI
+@using Client.Models
+
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject ICategoryApiService CategoryService
+@inject DialogService DialogService
+@inject ToastService Toast
+
+<PageHeader Title="Category details">
+    <Button Style="ButtonStyle.Default"
+             Href="/categories">
+        Back to list
+    </Button>
+
+    <Button Style="ButtonStyle.Primary"
+            Href="@($"/categories/edit/{Id}")">
+        Edit
+    </Button>
+
+    <Button Style="ButtonStyle.Danger"
+            OnClick="DeleteCategory">
+        Delete
+    </Button>
+</PageHeader>
+
+@if (isLoading)
+{
+    <LoadingSpinner />
+}
+else if (category is null)
+{
+    <p>Category not found.</p>
+}
+else
+{
+    <Card>
+        <p><strong>Name:</strong> @category.Name</p>
+    </Card>
+}
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+
+    private CategoryDetailsDto? category;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        category = await CategoryService.GetCategoryByIdAsync(Id);
+        isLoading = false;
+    }
+
+    private async Task DeleteCategory()
+    {
+        var confirmed = await DialogService.ConfirmAsync(
+            new DialogOptions
+            {
+                Title = "Delete category",
+                Message = "Are you sure you want to delete this category?",
+                ConfirmText = "Delete",
+                ConfirmStyle = ButtonStyle.Danger
+            });
+
+        if (!confirmed)
+            return;
+
+        try
+        {
+            await CategoryService.DeleteCategoryAsync(Id);
+
+            await Toast.Success("Category deleted successfully.");
+
+            Navigation.NavigateTo("/categories");
+        }
+        catch (Exception ex)
+        {
+            await Toast.Error(ex.Message);
+        }
+    }
+}

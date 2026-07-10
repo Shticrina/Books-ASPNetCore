@@ -31,7 +31,7 @@ else if (books.Count == 0)
 else
 {
     <Section>
-        <table class="table">
+        <table class="table w-full">
             <thead>
                 <tr>
                     <th>Title</th>
@@ -39,7 +39,7 @@ else
                     <th>Published</th>
                     <th>Author</th>
                     <th>Category</th>
-                    <th></th>
+                    <th class="text-center">Actions</th>
                 </tr>
             </thead>
 
@@ -51,26 +51,28 @@ else
                     <td>@book.Isbn</td>
                     <td>@book.PublishedYear</td>
                     <td>@book.AuthorName</td>
+
                     <td>
                         <Badge Style="@GetCategoryBadge(book.CategoryName)">
                             @book.CategoryName
                         </Badge>
                     </td>
-                    <td>
-                        <Button Style="ButtonStyle.Default"
-                                Href="@($"/books/{book.Id}")">
-                            Details
-                        </Button>
 
-                        <Button Style="ButtonStyle.Primary"
-                                Href="@($"/books/edit/{book.Id}")">
-                            Edit
-                        </Button>
-
-                        <Button Style="ButtonStyle.Danger"
-                                OnClick="() => DeleteBook(book.Id)">
-                            Delete
-                        </Button>
+                    <td class="text-center">
+                        <div class="flex justify-center gap-2">
+                            <Button Style="ButtonStyle.Default"
+                                    Href="@($"/books/{book.Id}")">
+                                Details
+                            </Button>
+                            <Button Style="ButtonStyle.Primary"
+                                    Href="@($"/books/edit/{book.Id}")">
+                                Edit
+                            </Button>
+                            <Button Style="ButtonStyle.Danger"
+                                    OnClick="() => DeleteBook(book.Id)">
+                                Delete
+                            </Button>
+                        </div>
                     </td>
                 </tr>
             }
