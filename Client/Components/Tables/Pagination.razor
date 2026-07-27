@@ -1,0 +1,48 @@
+@using Client.Models
+
+@if (TotalPages > 0)
+{
+    <div class="flex justify-between items-center mt-6">
+        <Button
+            Style="ButtonStyle.Default"
+            Disabled="@(CurrentPage == 1)"
+            OnClick="Previous">
+            Previous
+        </Button>
+
+        <span class="font-medium">
+            Page @CurrentPage of @TotalPages
+        </span>
+
+        <Button
+            Style="ButtonStyle.Default"
+            Disabled="@(CurrentPage == TotalPages)"
+            OnClick="Next">
+            Next
+        </Button>
+    </div>
+}
+
+@code
+{
+    [Parameter]
+    public int CurrentPage { get; set; }
+
+    [Parameter]
+    public int TotalPages { get; set; }
+
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    private async Task Previous()
+    {
+        if (CurrentPage > 1)
+            await PageChanged.InvokeAsync(CurrentPage - 1);
+    }
+
+    private async Task Next()
+    {
+        if (CurrentPage < TotalPages)
+            await PageChanged.InvokeAsync(CurrentPage + 1);
+    }
+}

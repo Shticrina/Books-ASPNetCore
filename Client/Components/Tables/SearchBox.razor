@@ -1,0 +1,24 @@
+<InputText
+    class="input input-bordered w-72"
+    placeholder="@Placeholder"
+    Value="@Value"
+    ValueChanged="OnValueChanged"
+    ValueExpression="@(() => Value)" />
+
+@code
+{
+    [Parameter]
+    public string Value { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public string Placeholder { get; set; } = "Search...";
+
+    private async Task OnValueChanged(string value)
+    {
+        Value = value;
+        await ValueChanged.InvokeAsync(value);
+    }
+}

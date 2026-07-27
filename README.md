@@ -415,12 +415,12 @@ https://localhost:7124
 - [x] Blazor WebAssembly client
 - [x] API service layer
 - [x] Server-side validation in forms
-- [ ] Edit Book page
-- [ ] Delete confirmation dialog
-- [ ] Book Details page
-- [ ] Author pages
-- [ ] Category pages
-- [ ] Tailwind CSS
+- [x] Edit Book page
+- [x] Delete confirmation dialog
+- [x] Book Details page
+- [x] Author pages
+- [x] Category pages
+- [x] Tailwind CSS
 - [ ] Dashboard
 - [ ] Search & filtering
 - [ ] Pagination

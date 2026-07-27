@@ -13,9 +13,11 @@ namespace Shared.DTOs.Books
         public string Isbn { get; set; } = string.Empty;
 
         public int PublishedYear { get; set; }
+        public int AuthorId { get; set; }
 
         public string AuthorName { get; set; } = string.Empty;
 
+        public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
     }
 } 

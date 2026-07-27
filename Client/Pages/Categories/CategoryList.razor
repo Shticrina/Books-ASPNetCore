@@ -30,17 +30,21 @@ else if (categories.Count == 0)
 }
 else
 {
-    <Section>
-        <table class="table w-full">
-            <thead>
-                <tr class="w-full flex justify-between">
-                    <th class="w-full text-left">Name</th>
-                    <th class="w-150 text-center">Actions</th>
-                </tr>
-            </thead>
+    <TableToolbar
+        SearchText="@searchText"
+        SearchChanged="@OnSearchChanged">
+    </TableToolbar>
 
-            <tbody>
-            @foreach (var category in categories)
+    <DataTable>
+        <Header>
+            <tr class="w-full flex justify-between">
+                <th class="w-full text-left">Name</th>
+                <th class="w-150 text-center">Actions</th>
+            </tr>
+        </Header>
+
+        <Rows>
+            @foreach (var category in PagedCategories)
             {
                 <tr class="w-full flex justify-between">
                     <td class="w-full text-left">@category.Name</td>
@@ -61,15 +65,41 @@ else
                     </td>
                 </tr>
             }
-            </tbody>
-        </table>
-    </Section>
+        </Rows>
+    </DataTable>
+
+    <Pagination
+        CurrentPage="@currentPage"
+        TotalPages="@totalPages"
+        PageChanged="@LoadPage" />
 }
 
 @code
 {
     private List<CategoryDto> categories = [];
     private bool isLoading = true;
+    private string searchText = "";
+    private int currentPage = 1;
+    private int pageSize = 10;
+    private int totalPages =>
+        (int)Math.Ceiling(categories.Count / (double)pageSize);
+
+    private Task OnSearchChanged(string value)
+    {
+        searchText = value;
+        return Task.CompletedTask;
+    }
+
+    private IEnumerable<CategoryDto> PagedCategories =>
+        categories
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize);
+
+    private Task LoadPage(int page)
+    {
+        currentPage = page;
+        return Task.CompletedTask;
+    }
 
     protected override async Task OnInitializedAsync()
     {

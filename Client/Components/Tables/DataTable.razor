@@ -1,0 +1,20 @@
+<TableContainer>
+    <table class="table table-zebra w-full">
+        <thead>
+            @Header
+        </thead>
+
+        <tbody>
+            @Rows
+        </tbody>
+    </table>
+</TableContainer>
+
+@code
+{
+    [Parameter]
+    public RenderFragment? Header { get; set; }
+
+    [Parameter]
+    public RenderFragment? Rows { get; set; }
+}

@@ -1,0 +1,31 @@
+@typeparam TValue where TValue : struct
+@using Client.Models
+
+<InputSelect TValue="TValue?"
+             class="select select-bordered"
+             Value="@Value"
+             ValueChanged="@ValueChanged"
+             ValueExpression="@(() => Value)">
+
+    <option value="">All</option>
+
+    @foreach (var item in Items)
+    {
+        <option value="@item.Value">
+            @item.Text
+        </option>
+    }
+
+</InputSelect>
+
+@code
+{
+    [Parameter]
+    public TValue? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue?> ValueChanged { get; set; }
+
+    [Parameter]
+    public IEnumerable<FilterItem<TValue>> Items { get; set; } = [];
+}

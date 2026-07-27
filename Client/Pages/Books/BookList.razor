@@ -21,18 +21,28 @@
 {
     <LoadingSpinner />
 }
-else if (books.Count == 0)
-{
-    <EmptyState
-        Title="No books found"
-        Message="Create your first book."
-    />
-}
 else
 {
-    <Section>
-        <table class="table w-full">
-            <thead>
+    <TableToolbar
+        SearchText="@searchText"
+        SearchChanged="@OnSearchChanged">
+
+        <FilterDropdown TValue="int"
+                Items="@categoryFilters"
+                Value="@selectedCategoryId"
+                ValueChanged="@OnCategoryChanged" />
+    </TableToolbar>
+
+    @if (filteredBooks.Count == 0)
+    {
+        <EmptyState
+            Title="No books found"
+            Message="No books match your search or filter." />
+    }
+    else
+    {
+        <DataTable>
+            <Header>
                 <tr>
                     <th>Title</th>
                     <th>ISBN</th>
@@ -41,55 +51,131 @@ else
                     <th>Category</th>
                     <th class="text-center">Actions</th>
                 </tr>
-            </thead>
+            </Header>
 
-            <tbody>
-            @foreach (var book in books)
-            {
-                <tr>
-                    <td>@book.Title</td>
-                    <td>@book.Isbn</td>
-                    <td>@book.PublishedYear</td>
-                    <td>@book.AuthorName</td>
+            <Rows>
+                @foreach (var book in PagedBooks)
+                {
+                    <tr>
+                        <td>@book.Title</td>
+                        <td>@book.Isbn</td>
+                        <td>@book.PublishedYear</td>
+                        <td>@book.AuthorName</td>
 
-                    <td>
-                        <Badge Style="@GetCategoryBadge(book.CategoryName)">
-                            @book.CategoryName
-                        </Badge>
-                    </td>
+                        <td>
+                            <Badge Style="@GetCategoryBadge(book.CategoryName)">
+                                @book.CategoryName
+                            </Badge>
+                        </td>
 
-                    <td class="text-center">
-                        <div class="flex justify-center gap-2">
-                            <Button Style="ButtonStyle.Default"
-                                    Href="@($"/books/{book.Id}")">
-                                Details
-                            </Button>
-                            <Button Style="ButtonStyle.Primary"
-                                    Href="@($"/books/edit/{book.Id}")">
-                                Edit
-                            </Button>
-                            <Button Style="ButtonStyle.Danger"
-                                    OnClick="() => DeleteBook(book.Id)">
-                                Delete
-                            </Button>
-                        </div>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </Section>
+                        <td class="text-center">
+                            <div class="flex justify-center gap-2">
+                                <Button Style="ButtonStyle.Default"
+                                        Href="@($"/books/{book.Id}")">
+                                    Details
+                                </Button>
+                                <Button Style="ButtonStyle.Primary"
+                                        Href="@($"/books/edit/{book.Id}")">
+                                    Edit
+                                </Button>
+                                <Button Style="ButtonStyle.Danger"
+                                        OnClick="() => DeleteBook(book.Id)">
+                                    Delete
+                                </Button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </Rows>
+        </DataTable>
+
+        <Pagination
+            CurrentPage="@currentPage"
+            TotalPages="@totalPages"
+            PageChanged="@LoadPage" />
+    }
 }
 
 @code
 {
     private List<BookDto> books = [];
+    private List<BookDto> filteredBooks = [];
+    private List<FilterItem<int>> categoryFilters = [];
     private bool isLoading = true;
+    private int? selectedCategoryId;
+    private string searchText = "";
+    private int currentPage = 1;
+    private int pageSize = 10;
+    private int totalPages =>
+        (int)Math.Ceiling(filteredBooks.Count / (double)pageSize);
 
     protected override async Task OnInitializedAsync()
     {
         books = await BookService.GetBooksAsync();
+        BuildCategoryFilters();
+        ApplyFilters();
         isLoading = false;
+    }
+
+    private void BuildCategoryFilters()
+    {
+        categoryFilters = books
+            .GroupBy(x => new { x.CategoryId, x.CategoryName })
+            .OrderBy(x => x.Key.CategoryName)
+            .Select(x => new FilterItem<int>
+            {
+                Value = x.Key.CategoryId,
+                Text = x.Key.CategoryName
+            })
+            .ToList();
+    }
+
+    private Task OnSearchChanged(string value)
+    {
+        searchText = value;
+        ApplyFilters();
+        return Task.CompletedTask;
+    }
+
+    private Task OnCategoryChanged(int? value)
+{
+    selectedCategoryId = value;
+    ApplyFilters();
+    return Task.CompletedTask;
+}
+
+private void ApplyFilters()
+{
+    IEnumerable<BookDto> query = books;
+
+    if (!string.IsNullOrWhiteSpace(searchText))
+    {
+        query = query.Where(book =>
+            book.Title.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            book.Isbn.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            book.AuthorName.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+    }
+
+    if (selectedCategoryId.HasValue)
+    {
+        query = query.Where(book =>
+            book.CategoryId == selectedCategoryId.Value);
+    }
+
+    filteredBooks = query.ToList();
+
+    currentPage = 1;
+}
+
+    private IEnumerable<BookDto> PagedBooks =>
+        filteredBooks
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize);
+
+    private Task LoadPage(int page)
+    {
+        currentPage = page;
+        return Task.CompletedTask;
     }
 
     private BadgeStyle GetCategoryBadge(string category)
