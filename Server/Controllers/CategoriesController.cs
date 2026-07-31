@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Server.Models;
 using Shared.DTOs.Categories;
 using Server.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -16,6 +17,7 @@ public class CategoriesController : ControllerBase
     }
 
     // GET: api/Category
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CategoryDto>>> GetCategories()
     {
@@ -24,6 +26,7 @@ public class CategoriesController : ControllerBase
     }
 
     // GET: api/Category/5
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ActionResult<CategoryDetailsDto>> GetCategory(int id)
     {
@@ -32,6 +35,7 @@ public class CategoriesController : ControllerBase
     }
 
     // POST: api/Category
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<CategoryDetailsDto>> PostCategory(CreateUpdateCategoryDto dto)
     {
@@ -43,6 +47,7 @@ public class CategoriesController : ControllerBase
     }
 
     // PUT: api/Category/5
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> PutCategory(int id, CreateUpdateCategoryDto dto)
     {
@@ -51,6 +56,7 @@ public class CategoriesController : ControllerBase
     }
 
     // DELETE: api/Category/5
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCategory(int id)
     {

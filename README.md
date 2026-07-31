@@ -422,9 +422,9 @@ https://localhost:7124
 - [x] Category pages
 - [x] Tailwind CSS
 - [ ] Dashboard
-- [ ] Search & filtering
-- [ ] Pagination
-- [ ] Authentication & Authorization
+- [x] Search & filtering
+- [x] Pagination
+- [ ] Authentication & Authorization (ASP.NET Core Identity + JWT + Blazor WebAssembly)
 - [ ] Repository pattern (optional)
 - [ ] Unit testing
 

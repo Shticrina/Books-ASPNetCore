@@ -25,7 +25,6 @@ public class AuthController : ControllerBase
         try
         {
             var response = await authService.RegisterAsync(request);
-
             return Ok(response);
         }
         catch (InvalidOperationException ex)
@@ -44,7 +43,6 @@ public class AuthController : ControllerBase
         try
         {
             var response = await authService.LoginAsync(request);
-
             return Ok(response);
         }
         catch (UnauthorizedAccessException)
@@ -60,8 +58,6 @@ public class AuthController : ControllerBase
     [HttpGet("me")]
     public async Task<ActionResult<CurrentUserDto>> Me()
     {
-        // var email = User.FindFirst(ClaimTypes.Email)?.Value;
-        // var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var id = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
         var email = User.FindFirst(JwtRegisteredClaimNames.Email)?.Value;
 

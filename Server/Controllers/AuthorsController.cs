@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Shared.DTOs.Authors;
 using Server.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -14,6 +15,7 @@ public class AuthorsController : ControllerBase
     }
 
     // GET: api/Author
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AuthorDto>>> GetAuthors()
     {
@@ -22,6 +24,7 @@ public class AuthorsController : ControllerBase
     }
 
     // GET: api/Author/5
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ActionResult<AuthorDetailsDto>> GetAuthor(int id)
     {
@@ -30,7 +33,7 @@ public class AuthorsController : ControllerBase
     }
 
     // POST: api/Author
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<AuthorDetailsDto>> PostAuthor(CreateUpdateAuthorDto dto)
     {
@@ -42,6 +45,7 @@ public class AuthorsController : ControllerBase
     }
 
     // PUT: api/Author/5
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> PutAuthor(int id, CreateUpdateAuthorDto dto)
     {
@@ -51,6 +55,7 @@ public class AuthorsController : ControllerBase
 
 
     // DELETE: api/Author/5
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAuthor(int id)
     {

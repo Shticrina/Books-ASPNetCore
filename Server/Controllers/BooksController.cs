@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Shared.DTOs.Books;
 using Server.Interfaces;
 using Shared.Responses;
+using Microsoft.AspNetCore.Authorization;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -15,6 +16,7 @@ public class BooksController : ControllerBase
     }
 
     // GET: api/Book
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<ApiResponse<List<BookDto>>>> GetBooks()
     {
@@ -28,6 +30,7 @@ public class BooksController : ControllerBase
     }
 
     // GET: api/Book/5
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ActionResult<ApiResponse<BookDetailsDto>>> GetBook(int id)
     {
@@ -40,6 +43,7 @@ public class BooksController : ControllerBase
     }
 
     // POST: api/Book
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<ApiResponse<BookDetailsDto>>> PostBook(CreateBookDto dto)
     {
@@ -58,6 +62,7 @@ public class BooksController : ControllerBase
     }
     
     // PUT: api/Book/5
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> PutBook(int id, UpdateBookDto dto)
     {
@@ -69,6 +74,7 @@ public class BooksController : ControllerBase
     }
 
     // DELETE: api/Book/5
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<ActionResult<ApiResponse<bool>>> DeleteBook(int id)
     {
