@@ -1,7 +1,5 @@
 using Shared.DTOs.Books;
 using Client.Interfaces.Api;
-using System.Net.Http.Json;
-using Shared.Responses;
 
 namespace Client.Services.Api;
 

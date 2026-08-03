@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Client.Interfaces.Api;
 using Client.Services.Api;
 using Client.Services.UI;
+using Client.Services.Auth;
+using Microsoft.AspNetCore.Components.Authorization;
+using Client.Auth;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -18,5 +21,12 @@ builder.Services.AddScoped<ICategoryApiService, CategoryApiService>();
 builder.Services.AddScoped<IAuthorApiService, AuthorApiService>();
 builder.Services.AddScoped<ToastService>();
 builder.Services.AddScoped<DialogService>();
+
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<TokenStorageService>();
+builder.Services.AddScoped<IAuthApiService, AuthApiService>();
+builder.Services.AddScoped<JwtAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(
+    sp => sp.GetRequiredService<JwtAuthenticationStateProvider>());
 
 await builder.Build().RunAsync();
