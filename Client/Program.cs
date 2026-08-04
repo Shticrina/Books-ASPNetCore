@@ -12,9 +12,19 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+builder.Services.AddScoped<AuthorizationMessageHandler>();
+
 // builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 // builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7188/") }); // https profile
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5191/") }); // http profile
+builder.Services.AddScoped(sp =>
+{
+    var handler = sp.GetRequiredService<AuthorizationMessageHandler>();
+    handler.InnerHandler = new HttpClientHandler();
+    return new HttpClient(handler)
+    {
+        BaseAddress = new Uri("http://localhost:5191/") // http profile
+    };
+});
 
 builder.Services.AddScoped<IBookApiService, BookApiService>();
 builder.Services.AddScoped<ICategoryApiService, CategoryApiService>();

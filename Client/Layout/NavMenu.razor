@@ -1,10 +1,48 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Client.Auth
+@using Client.Models
+@using Client.Services.Auth
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject NavigationManager Navigation
+@inject TokenStorageService TokenStorage
+@inject JwtAuthenticationStateProvider AuthStateProvider
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Client</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
     </div>
+
+    @* Add authentication *@
+    <AuthorizeView>
+        <Authorized>
+            <div class="me-3">
+                Hello @context.User.Identity?.Name
+            </div>
+
+            <Button
+                Style="ButtonStyle.Default"
+                OnClick="Logout">
+                Logout
+            </Button>
+        </Authorized>
+
+        <NotAuthorized>
+            <Button
+                Style="ButtonStyle.Default"
+                Href="/login">
+                Login
+            </Button>
+
+            <Button
+                Style="ButtonStyle.Primary"
+                Href="/register">
+                Register
+            </Button>
+        </NotAuthorized>
+    </AuthorizeView>
 </div>
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
@@ -40,5 +78,12 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task Logout()
+    {
+        await TokenStorage.ClearTokenAsync();
+        AuthStateProvider.NotifyUserLogout();
+        Navigation.NavigateTo("/");
     }
 }

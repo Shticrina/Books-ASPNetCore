@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Server.Configuration;
 using Server.Data;
+using Server.Exceptions;
 using Server.Interfaces;
 using Shared.DTOs.Auth;
 
@@ -31,8 +32,12 @@ public class AuthService : IAuthService
 
         if (existingUser is not null)
         {
-            throw new InvalidOperationException(
-                "A user with this email already exists.");
+            throw new AuthValidationException(
+                new Dictionary<string, string[]>
+                {
+                    ["Email"] =
+                    ["A user with this email already exists."]
+                });
         }
 
         var user = new ApplicationUser
@@ -47,11 +52,12 @@ public class AuthService : IAuthService
 
         if (!result.Succeeded)
         {
-            var errors = string.Join(
-                ", ",
-                result.Errors.Select(e => e.Description));
-
-            throw new InvalidOperationException(errors);
+            throw new AuthValidationException(
+                result.Errors
+                    .GroupBy(e => e.Code.Contains("Password") ? "Password" : "Email")
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.Description).ToArray()));
         }
 
         return await CreateAuthResponseAsync(user);
@@ -93,7 +99,8 @@ public class AuthService : IAuthService
             new(JwtRegisteredClaimNames.Email, user.Email!),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(ClaimTypes.NameIdentifier, user.Id),
-            new(ClaimTypes.Email, user.Email!)
+            new(ClaimTypes.Email, user.Email!),
+            new Claim(ClaimTypes.Name, user.Email!)
         };
 
         var roles = await userManager.GetRolesAsync(user);

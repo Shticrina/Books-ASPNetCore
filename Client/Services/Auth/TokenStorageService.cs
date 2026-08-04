@@ -17,6 +17,6 @@ public class TokenStorageService
     public ValueTask<string?> GetTokenAsync()
         => _js.InvokeAsync<string?>("localStorage.getItem", "authToken");
 
-    public ValueTask RemoveTokenAsync()
+    public ValueTask ClearTokenAsync()
         => _js.InvokeVoidAsync("localStorage.removeItem", "authToken");
 }

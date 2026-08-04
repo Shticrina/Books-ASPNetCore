@@ -1,0 +1,85 @@
+@page "/login"
+
+@using Shared.DTOs.Auth
+@using Client.Services.UI
+@using Client.Services.Auth
+@using Client.Auth
+@using Client.Models
+@using Client.Exceptions
+
+@inject IAuthApiService AuthService
+@inject JwtAuthenticationStateProvider AuthStateProvider
+@inject TokenStorageService TokenStorage
+@inject NavigationManager Navigation
+@inject ToastService Toast
+
+<PageHeader Title="Login" />
+
+<div class="max-w-md mx-auto mt-6">
+    <EditForm Model="@model" OnValidSubmit="@HandleLoginAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-4">
+            <label>Email</label>
+
+            <InputText
+                class="input input-bordered w-full"
+                @bind-Value="model.Email" />
+        </div>
+
+        <div class="mb-4">
+            <label>Password</label>
+
+            <InputText
+                type="password"
+                class="input input-bordered w-full"
+                @bind-Value="model.Password" />
+        </div>
+
+        <Button Style="ButtonStyle.Primary" Type="submit">
+            Login
+        </Button>
+    </EditForm>
+</div>
+
+@* Login credentials for testing:
+{
+  "email": "cri@test.com",
+  "password": "criCRI12345678"
+} *@
+
+@code
+{
+    private LoginRequestDto model = new();
+    private readonly List<string> validationMessages = [];
+
+    private async Task HandleLoginAsync()
+    {
+        try
+        {
+
+            var response = await AuthService.LoginAsync(model);
+
+            await TokenStorage.SetTokenAsync(response.Token);
+
+            AuthStateProvider.NotifyUserAuthentication();
+
+            Navigation.NavigateTo("/");
+        }
+        catch (ApiValidationException ex)
+        {
+            validationMessages.Clear();
+
+            foreach (var error in ex.ValidationProblem.Errors)
+            {
+                validationMessages.AddRange(error.Value);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            await Toast.Error(ex.Message);
+        }
+    }
+}

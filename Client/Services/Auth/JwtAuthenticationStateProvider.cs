@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Client.Auth;
 
-public class JwtAuthenticationStateProvider : AuthenticationStateProvider
+public class JwtAuthenticationStateProvider
+    : AuthenticationStateProvider
 {
     private readonly TokenStorageService tokenStorage;
 
@@ -20,16 +21,12 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
         var token = await tokenStorage.GetTokenAsync();
 
         if (string.IsNullOrWhiteSpace(token))
-        {
             return Anonymous();
-        }
 
         var handler = new JwtSecurityTokenHandler();
 
         if (!handler.CanReadToken(token))
-        {
             return Anonymous();
-        }
 
         var jwt = handler.ReadJwtToken(token);
 
@@ -37,9 +34,8 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
             jwt.Claims,
             "jwt");
 
-        var user = new ClaimsPrincipal(identity);
-
-        return new AuthenticationState(user);
+        return new AuthenticationState(
+            new ClaimsPrincipal(identity));
     }
 
     public void NotifyUserAuthentication()
@@ -51,7 +47,7 @@ public class JwtAuthenticationStateProvider : AuthenticationStateProvider
     public void NotifyUserLogout()
     {
         NotifyAuthenticationStateChanged(
-            GetAuthenticationStateAsync());
+            Task.FromResult(Anonymous()));
     }
 
     private AuthenticationState Anonymous()

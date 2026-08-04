@@ -1,0 +1,90 @@
+@page "/register"
+
+@using Shared.DTOs.Auth
+@using Client.Services.UI
+@using Client.Auth
+@using Client.Services.Auth
+@using Client.Models
+@using Client.Exceptions
+
+@inject IAuthApiService AuthService
+@inject JwtAuthenticationStateProvider AuthStateProvider
+@inject TokenStorageService TokenStorage
+@inject NavigationManager Navigation
+@inject ToastService Toast
+
+<PageHeader Title="Create Account" />
+
+<div class="max-w-md mx-auto mt-6">
+    <EditForm Model="@model" OnValidSubmit="@HandleRegister">
+        <DataAnnotationsValidator />
+        @if (validationMessages.Any())
+        {
+            <div class="alert alert-error mb-4">
+                <ul class="list-disc list-inside">
+                    @foreach (var message in validationMessages)
+                    {
+                        <li>@message</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <div class="mb-4">
+            <label>Email</label>
+
+            <InputText
+                class="input input-bordered w-full"
+                @bind-Value="model.Email" />
+        </div>
+
+        <div class="mb-4">
+            <label>Password</label>
+
+            <InputText
+                type="password"
+                class="input input-bordered w-full"
+                @bind-Value="model.Password" />
+        </div>
+
+        <Button Style="ButtonStyle.Primary" Type="submit">
+            Register
+        </Button>
+    </EditForm>
+</div>
+
+@code
+{
+    private RegisterRequestDto model = new();
+    private readonly List<string> validationMessages = [];
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            var response = await AuthService.RegisterAsync(model);
+
+            await TokenStorage.SetTokenAsync(response.Token);
+
+            AuthStateProvider.NotifyUserAuthentication();
+
+            await Toast.Success("Account created.");
+
+            Navigation.NavigateTo("/");
+        }
+        catch (ApiValidationException ex)
+        {
+            validationMessages.Clear();
+
+            foreach (var error in ex.ValidationProblem.Errors)
+            {
+                validationMessages.AddRange(error.Value);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.GetType().FullName);
+            await Toast.Error(ex.Message);
+        }
+    }
+}

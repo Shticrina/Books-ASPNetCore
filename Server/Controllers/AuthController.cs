@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Server.Exceptions;
 using Server.Interfaces;
 using Shared.DTOs.Auth;
+using Shared.Responses;
+
 // using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -25,14 +28,25 @@ public class AuthController : ControllerBase
         try
         {
             var response = await authService.RegisterAsync(request);
-            return Ok(response);
+            return Ok(new ApiResponse<AuthResponseDto>
+                {
+                    Success = true,
+                    Message = "Registration successful.",
+                    StatusCode = 200,
+                    Data = response
+                });
         }
-        catch (InvalidOperationException ex)
+        catch (AuthValidationException ex)
         {
-            return BadRequest(new
+            foreach (var error in ex.Errors)
             {
-                message = ex.Message
-            });
+                foreach (var message in error.Value)
+                {
+                    ModelState.AddModelError(error.Key, message);
+                }
+            }
+
+            return ValidationProblem(ModelState);
         }
     }
 
@@ -43,13 +57,21 @@ public class AuthController : ControllerBase
         try
         {
             var response = await authService.LoginAsync(request);
-            return Ok(response);
+            return Ok(new ApiResponse<AuthResponseDto>
+            {
+                Success = true,
+                Message = "Login successful.",
+                StatusCode = 200,
+                Data = response
+            });
         }
         catch (UnauthorizedAccessException)
         {
-            return Unauthorized(new
+            return Unauthorized(new ApiResponse<AuthResponseDto>
             {
-                message = "Invalid email or password."
+                Success = false,
+                Message = "Invalid email or password.",
+                StatusCode = 401
             });
         }
     }
