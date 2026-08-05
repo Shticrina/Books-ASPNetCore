@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Server.Models;
+using Server.Entities;
 using Shared.DTOs.Categories;
 using Server.Interfaces;
 using Microsoft.AspNetCore.Authorization;

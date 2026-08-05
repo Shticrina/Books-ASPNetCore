@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Server.Models;
+using Server.Entities;
 using Shared.DTOs.Authors;
 using Server.Interfaces;
 

@@ -18,24 +18,28 @@ public class JwtAuthenticationStateProvider
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var token = await tokenStorage.GetTokenAsync();
+        try
+        {
+            var token = await tokenStorage.GetTokenAsync();
 
-        if (string.IsNullOrWhiteSpace(token))
+            if (string.IsNullOrWhiteSpace(token))
+                return Anonymous();
+
+            var handler = new JwtSecurityTokenHandler();
+
+            if (!handler.CanReadToken(token))
+                return Anonymous();
+
+            var jwt = handler.ReadJwtToken(token);
+
+            var identity = new ClaimsIdentity(jwt.Claims, "jwt");
+
+            return new AuthenticationState(new ClaimsPrincipal(identity));
+        }
+        catch
+        {
             return Anonymous();
-
-        var handler = new JwtSecurityTokenHandler();
-
-        if (!handler.CanReadToken(token))
-            return Anonymous();
-
-        var jwt = handler.ReadJwtToken(token);
-
-        var identity = new ClaimsIdentity(
-            jwt.Claims,
-            "jwt");
-
-        return new AuthenticationState(
-            new ClaimsPrincipal(identity));
+        }
     }
 
     public void NotifyUserAuthentication()
